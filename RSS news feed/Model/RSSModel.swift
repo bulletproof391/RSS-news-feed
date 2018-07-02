@@ -48,8 +48,7 @@ class RSSModel {
     private var rssFeed = [RSSData]()
     
     // MARK: - Public Methods
-//    func getData(completionHandler: @escaping() -> Void) {
-    func getData() {
+    func getData(completionHandler: @escaping([RSSData]) -> Void) {
         threadsCount = sources.count
         
         for item in sources {
@@ -61,8 +60,15 @@ class RSSModel {
                         self.threadsCount -= 1
 
                         if self.threadsCount == 0 {
+                            self.rssFeed.sort {
+                                guard let nameOne = $0.publicationDate, let nameTwo = $1.publicationDate else { return false }
+                                return nameOne < nameTwo
+                            }
+                            
                             print("All threads are finished")
                             print(self.rssFeed.count)
+                            
+                            completionHandler(self.rssFeed)
                         }
                     }
                 }

@@ -18,7 +18,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         let model = RSSModel()
-        model.getData()
+        let viewModel = RSSFeedTableViewModel(with: model)
+        let navigationController = self.window!.rootViewController! as! UINavigationController
+        let rssFeedTableViewController = navigationController.viewControllers[0] as! RSSFeedTableViewController
+        rssFeedTableViewController.viewModel = viewModel
+        
         return true
     }
 

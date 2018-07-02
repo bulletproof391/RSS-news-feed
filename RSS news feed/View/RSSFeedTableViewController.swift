@@ -9,8 +9,13 @@
 import UIKit
 
 class RSSFeedTableViewController: UITableViewController {
+    // MARK: - Private Properties
     private let reuseIdentifier = "Cell"
-
+    
+    // MARK: - Public Properties
+    var viewModel: RSSFeedTableViewModel!
+    
+    // MARK: - Super Class Methods
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,6 +25,9 @@ class RSSFeedTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
+        // bind model
+        bindModel()
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -27,28 +35,36 @@ class RSSFeedTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    
     // MARK: - Table view data source
-
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
+        return viewModel.numberOfSections()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 1
+        return viewModel.numberOfRowsInSection(section: section)
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! RSSFeedTableViewCell
 
-        // Configure the cell...
+        cell.viewModel = viewModel.cellForRow(at: indexPath)
 
         return cell
     }
     
-
+    
+    // MARK: - Private Methods
+    private func bindModel() {
+        viewModel.hasUpdated.signal.observeResult({ [weak self] (result) in
+            guard let weakSelf = self else { return }
+            DispatchQueue.main.async {
+                weakSelf.tableView!.reloadData()
+            }
+        })
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
