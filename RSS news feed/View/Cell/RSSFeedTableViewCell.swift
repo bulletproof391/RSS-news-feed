@@ -43,15 +43,13 @@ class RSSFeedTableViewCell: UITableViewCell {
         if let isHidden = viewModel?.isHidden {
             newsDescription.isHidden = isHidden
         }
-        
-        viewModel?.imageReactive.producer.startWithResult{ [weak self] (receivedImage) in
+        newsImage.image = nil
+        viewModel?.getImage(completionHandler: { [weak self] (receivedImage) in
             guard let weakSelf = self else { return }
             DispatchQueue.main.async {
-                if let _ = receivedImage.value {
-                    weakSelf.newsImage.image = receivedImage.value!
-                }
+                weakSelf.newsImage.image = receivedImage                
             }
-        }
+        })
     }
     
     // MARK: - Public Methods
