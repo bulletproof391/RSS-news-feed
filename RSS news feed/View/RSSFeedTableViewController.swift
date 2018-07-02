@@ -55,6 +55,19 @@ class RSSFeedTableViewController: UITableViewController {
     }
     
     
+    // MARK: - Table view Delegate
+    // do work when cell is tapped
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let cell = tableView.cellForRow(at: indexPath) as! RSSFeedTableViewCell
+        tableView.beginUpdates()
+        cell.showDescription()
+        tableView.endUpdates()
+        
+    }
+    
+    
     // MARK: - Private Methods
     private func bindModel() {
         viewModel.hasUpdated.signal.observeResult({ [weak self] (result) in

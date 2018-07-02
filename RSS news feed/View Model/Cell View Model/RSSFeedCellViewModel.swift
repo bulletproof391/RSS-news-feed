@@ -10,12 +10,12 @@ import UIKit
 import ReactiveSwift
 
 class RSSFeedCellViewModel {
-    // MARK: - Private Properties
-    private(set) var image: UIImage?
+    // MARK: - Public Properties
     private(set) var title: String?
     private(set) var description: String?
     private(set) var publicationDate: Date?
     private(set) var source: String?
+    var isHidden: Bool
     
     // MARK: - Public Properties
     private(set) var imageReactive = MutableProperty(UIImage())
@@ -27,6 +27,7 @@ class RSSFeedCellViewModel {
         self.description = rssItem.description
         self.publicationDate = rssItem.publicationDate
         self.source = rssItem.sourceName
+        self.isHidden = false
         downLoadImage(rssItem.imageURL)
         
     }
@@ -36,7 +37,6 @@ class RSSFeedCellViewModel {
         if let _ = url {
             URLSession.shared.dataTask(with: url!) { [weak self] (data, urlRsponse, err) in
                 if let receivedData = data, let weakSelf = self, let receivedImage = UIImage(data: receivedData) {
-                    weakSelf.image = receivedImage
                     weakSelf.imageReactive.value = receivedImage
                 }
             }.resume()

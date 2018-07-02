@@ -12,17 +12,9 @@ class RSSFeedTableViewCell: UITableViewCell {
 
     // MARK: - UI Properties
     @IBOutlet weak var newsImage: UIImageView!
-    @IBOutlet weak var newsTitle: UILabel! {
-        didSet {
-            newsTitle.numberOfLines = 2
-        }
-    }
+    @IBOutlet weak var newsTitle: UILabel!
     @IBOutlet weak var newsSource: UILabel!
-    @IBOutlet weak var newsDescription: UILabel! {
-        didSet {
-            newsDescription.numberOfLines = 3
-        }
-    }
+    @IBOutlet weak var newsDescription: UILabel!
     
     // MARK: - Public Properties
     var viewModel: RSSFeedCellViewModel?{
@@ -48,6 +40,9 @@ class RSSFeedTableViewCell: UITableViewCell {
         newsTitle.text = viewModel?.title
         newsSource.text = viewModel?.source
         newsDescription.text = viewModel?.description
+        if let isHidden = viewModel?.isHidden {
+            newsDescription.isHidden = isHidden
+        }
         
         viewModel?.imageReactive.producer.startWithResult{ [weak self] (receivedImage) in
             guard let weakSelf = self else { return }
@@ -57,5 +52,11 @@ class RSSFeedTableViewCell: UITableViewCell {
                 }
             }
         }
+    }
+    
+    // MARK: - Public Methods
+    func showDescription() {
+        newsDescription.isHidden = (newsDescription.isHidden) ? false : true
+        viewModel?.isHidden = newsDescription.isHidden
     }
 }
