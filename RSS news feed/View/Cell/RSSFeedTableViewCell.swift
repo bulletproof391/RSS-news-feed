@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import ReactiveSwift
+import ReactiveCocoa
+import Result
 
 class RSSFeedTableViewCell: UITableViewCell {
 
@@ -17,16 +20,13 @@ class RSSFeedTableViewCell: UITableViewCell {
     @IBOutlet weak var newsDescription: UILabel!
     
     // MARK: - Public Properties
-    var viewModel: RSSFeedCellViewModel?{
-        didSet {
-            initializeView()
-        }
-    }
+    let viewModel: MutableProperty<RSSFeedCellViewModel> = MutableProperty(RSSFeedCellViewModel())
     
     // MARK: - Super Class Methods
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        initializeView()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -37,24 +37,19 @@ class RSSFeedTableViewCell: UITableViewCell {
     
     // MARK: - Private Methods
     private func initializeView() {
-        newsTitle.text = viewModel?.title
-        newsSource.text = viewModel?.source
-        newsDescription.text = viewModel?.description
-        if let isHidden = viewModel?.isHidden {
-            newsDescription.isHidden = isHidden
+        newsTitle.reactive.text <~ viewModel.map { $0.title }
+        newsSource.reactive.text <~ viewModel.map { $0.source }
+        newsDescription.reactive.text <~ viewModel.map { $0.description }
+        newsDescription.reactive.isHidden <~ viewModel.map{ $0.isHidden }
+        
+        newsImage.reactive.image <~ viewModel.producer.flatMap(.latest) { cellViewModel in
+            cellViewModel.getImage().map(Optional.some).prefix(value: nil)
         }
-        newsImage.image = nil
-        viewModel?.getImage(completionHandler: { [weak self] (receivedImage) in
-            guard let weakSelf = self else { return }
-            DispatchQueue.main.async {
-                weakSelf.newsImage.image = receivedImage                
-            }
-        })
     }
     
     // MARK: - Public Methods
     func showDescription() {
         newsDescription.isHidden = (newsDescription.isHidden) ? false : true
-        viewModel?.isHidden = newsDescription.isHidden
+        viewModel.value.isHidden = newsDescription.isHidden
     }
 }
